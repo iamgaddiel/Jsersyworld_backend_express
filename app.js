@@ -1,5 +1,5 @@
-const dotenv = require('dotenv')
-const express = require('express')
+import express from 'express'
+import dotenv from 'dotenv'
 
 
 // Routers
@@ -22,4 +22,3 @@ app.use('/api/v1/auth/', authRouter)
 
 
 app.listen(port , () => console.log(`Server started at port ${port}`))
-

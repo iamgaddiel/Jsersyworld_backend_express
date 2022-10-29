@@ -1,7 +1,7 @@
-const express = require('express')
+import express from 'express'
 const dotenv = require('dotenv')
-const loginController = require('../controllers/LoginController.js')
-const registrationController = require('../controllers/RegistrationController.js')
+import loginController from '../controllers/login.controller'
+const registrationController = require('../controllers/register.controller')
 
 
 dotenv.config()
@@ -12,4 +12,4 @@ router.post('/login', loginController)
 router.post('/register', registrationController)
 
 
-module.exports = router
+export default router

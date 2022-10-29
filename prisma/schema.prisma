@@ -1,0 +1,158 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String           @id @default(uuid())
+  firstname       String
+  lastname        String
+  phone           String           @unique
+  image           Bytes?
+  country         String
+  password        String
+  email           String           @unique
+  address         String?
+  username        String           @unique
+  street          String?
+  deliveryAddress DeliveryAddress?
+  cart            Cart?
+  orderItem       OrderItem?
+  transaction     Transaction[]
+  Comments        Comments[]
+  BillingAddress  BillingAddress[]
+}
+
+// ------------------------------------------------------------------
+// -------------------------- [ Finance , ] `-----------------------
+// ------------------------------------------------------------------
+model Cart {
+  id        String      @id @default(uuid())
+  user      User        @relation(fields: [userId], references: [id])
+  userId    String      @unique
+  orderItem OrderItem[]
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @unique
+  jersey    Jersey   @relation(fields: [jerseyId], references: [id])
+  jerseyId  String   @unique
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  cartId    String
+  Order     Order?   @relation(fields: [orderId], references: [id])
+  orderId   String?
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id               String         @id @default(uuid())
+  orderItems       OrderItem[]
+  totalAmount      Float
+  subTotal         Float
+  isDelivered      Boolean        @default(false)
+  isOrdered        Boolean        @default(false)
+  updatedAt        DateTime       @updatedAt
+  createdAt        DateTime       @default(now())
+  billing          BillingAddress @relation(fields: [billingAddressId], references: [id])
+  billingAddressId String
+  shipmentMethod   ShipmentMethod @relation(fields: [shipmentMethodId], references: [id])
+  shipmentMethodId String         @unique
+}
+
+model ShipmentMethod {
+  id             String @id @default(uuid())
+  title          String
+  daysToDelivery Int
+  deliveryFee    Float
+  Order          Order?
+}
+
+model DeliveryAddress {
+  id     String @id @default(uuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
+}
+
+model BillingAddress {
+  id        String  @id @default(uuid())
+  user      User    @relation(fields: [userId], references: [id])
+  firstname String
+  lastname  String
+  country   String
+  email     String
+  zipcode   String
+  state     String
+  orderNote String?
+  street    String
+  Order     Order[]
+  userId    String
+}
+
+model Transaction {
+  id            String @id @default(uuid())
+  user          User   @relation(fields: [userId], references: [id])
+  userId        String
+  transactionId String @default(uuid())
+  orderAmount   String
+}
+
+// ------------------------------------------------------------------
+// -------------------------- [ Jsersey ] `   -----------------------
+// ------------------------------------------------------------------
+
+model Jersey {
+  id          String          @id @default(uuid())
+  title       String
+  mainImage   Bytes
+  imageTow    Bytes
+  imageThree  Bytes?
+  imageFour   Bytes?
+  imageFive   Bytes?
+  quantity    Int
+  size        JeserySize
+  price       Float
+  description String
+  discount    Float
+  category    SportCategory[]
+  orderItem   OrderItem?
+  rating      Float
+  comment     Comments[]
+}
+
+model Comments {
+  id       String  @id @default(uuid())
+  user     User    @relation(fields: [userId], references: [id])
+  Jersey   Jersey? @relation(fields: [jerseyId], references: [id])
+  jerseyId String?
+  userId   String
+}
+
+model SportCategory {
+  id       String @id @default(uuid())
+  title    String
+  jersey   Jersey @relation(fields: [jerseyId], references: [id])
+  jerseyId String
+}
+
+enum JeserySize {
+  XS
+  S
+  M
+  L
+  XL
+  XXL
+  XXXL
+}
+
+// ------------------------------------------------------------------
+// -------------------------- [ Finance , ] `-----------------------
+// ------------------------------------------------------------------
